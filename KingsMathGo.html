@@ -1,0 +1,1551 @@
+<!-- Kings Mathgo – Royal Math Game v2.0 - Complete Working Version -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Kings Mathgo – A Royal Math Game</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #0f1b2b;
+      --accent: #e8c24a;
+      --muted: #9fb3c8;
+      --correct: #21c55d;
+      --wrong: #ef4444;
+      --powerup: #8b5cf6;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    
+    body {
+      background: linear-gradient(180deg, #051022 0%, #081426 100%);
+      color: #e7f6ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+    
+    /* Main Menu */
+    .main-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(180deg, #051022 0%, #081426 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .menu-content {
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .menu-crown {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .menu-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ffd86b, #e8c24a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .menu-subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+    
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .menu-btn {
+      padding: 15px;
+      background: linear-gradient(180deg, rgba(232, 194, 74, 0.15), rgba(232, 194, 74, 0.05));
+      border: 1px solid rgba(232, 194, 74, 0.3);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .menu-btn:active {
+      transform: scale(0.98);
+      background: rgba(232, 194, 74, 0.25);
+    }
+    
+    .menu-settings {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .menu-settings label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+      font-size: 0.9rem;
+    }
+    
+    .menu-settings select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 5px;
+      border-radius: 5px;
+      width: 150px;
+    }
+    
+    /* Game Stage */
+    .stage {
+      width: 100%;
+      max-width: 800px;
+      height: 100%;
+      display: none;
+      flex-direction: column;
+      padding: 10px;
+    }
+    
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .crown {
+      width: 50px;
+      height: 50px;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    
+    .question {
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 20px 0;
+      background: linear-gradient(90deg, #fff, #dbefff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .choice {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .choice:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .choice.correct {
+      background: linear-gradient(90deg, rgba(33, 197, 93, 0.2), rgba(33, 197, 93, 0.1));
+      border-color: var(--correct);
+      animation: correctPop 0.3s;
+    }
+    
+    .choice.wrong {
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+      border-color: var(--wrong);
+    }
+    
+    .power-up-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .power-up-slot {
+      width: 50px;
+      height: 50px;
+      background: rgba(139, 92, 246, 0.1);
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .power-up-slot:active {
+      transform: scale(0.95);
+      background: rgba(139, 92, 246, 0.2);
+    }
+    
+    .big-score {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-align: center;
+      margin: 10px 0;
+    }
+    
+    .footer-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-width: 120px;
+    }
+    
+    .btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(0.98);
+    }
+    
+    /* Modal System */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    
+    .modal {
+      background: linear-gradient(180deg, #071224, #0c1b2b);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal h3 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+    
+    .achievement-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+    }
+    
+    .achievement-icon {
+      font-size: 24px;
+      width: 40px;
+      text-align: center;
+    }
+    
+    .achievement-info {
+      flex: 1;
+    }
+    
+    .achievement-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .achievement-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    .achievement-status {
+      font-size: 20px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .stat-item {
+      background: rgba(255, 255, 255, 0.02);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes correctPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .menu-title {
+        font-size: 2rem;
+      }
+      
+      .question {
+        font-size: 1.5rem;
+      }
+      
+      .choices {
+        grid-template-columns: 1fr;
+      }
+      
+      .choice {
+        min-height: 70px;
+        font-size: 1.1rem;
+      }
+      
+      .footer-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .modal {
+        padding: 15px;
+      }
+    }
+    
+    @media (max-height: 600px) {
+      .menu-content {
+        padding: 10px;
+      }
+      
+      .menu-title {
+        font-size: 1.8rem;
+      }
+      
+      .menu-buttons {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Main Menu -->
+  <div class="main-menu" id="mainMenu">
+    <div class="menu-content">
+      <svg class="menu-crown" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="g2" x1="0" x2="1">
+            <stop offset="0" stop-color="#ffd86b"/>
+            <stop offset="1" stop-color="#e8c24a"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#g2)" d="M4 48c0 2.2 1.8 4 4 4h48c2.2 0 4-1.8 4-4V18c0-1.1-.6-2.2-1.5-2.7L44 4 36 22l-8-18L8 15.3C6.6 15.9 6 17 6 18v30z"/>
+      </svg>
+      
+      <h1 class="menu-title">Kings Mathgo</h1>
+      <p class="menu-subtitle">Solve royal riddles with power-ups!</p>
+      
+      <div class="menu-buttons">
+        <button class="menu-btn" id="startGame">Start New Game</button>
+        <button class="menu-btn" id="continueGame" style="display:none">Continue Game</button>
+        <button class="menu-btn" id="viewAchievements">Achievements</button>
+        <button class="menu-btn" id="viewStats">Statistics</button>
+      </div>
+
+      <div class="menu-settings">
+        <label>
+          <span>Game Mode:</span>
+          <select id="menuModeSelect">
+            <option value="mixed">Mixed Operations</option>
+            <option value="addition">Addition Only</option>
+            <option value="subtraction">Subtraction Only</option>
+            <option value="multiplication">Multiplication Only</option>
+            <option value="division">Division Only</option>
+          </select>
+        </label>
+        <label>
+          <span>Difficulty:</span>
+          <select id="menuDifficultySelect">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+            <option value="master">Master</option>
+          </select>
+        </label>
+      </div>
+
+      <div style="margin-top: 20px; color: var(--muted); font-size: 0.9rem;">
+        <div>High Score: <strong id="menuHighscore">0</strong></div>
+        <div>Total Games: <strong id="totalGames">0</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Stage -->
+  <div class="stage" id="gameStage">
+    <header>
+      <svg class="crown" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="g1" x1="0" x2="1">
+            <stop offset="0" stop-color="#ffd86b"/>
+            <stop offset="1" stop-color="#e8c24a"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#g1)" d="M4 48c0 2.2 1.8 4 4 4h48c2.2 0 4-1.8 4-4V18c0-1.1-.6-2.2-1.5-2.7L44 4 36 22l-8-18L8 15.3C6.6 15.9 6 17 6 18v30z"/>
+      </svg>
+      <div>
+        <h1>Kings Mathgo</h1>
+        <div style="color: var(--muted); font-size: 0.8rem;">Royal Math Game</div>
+      </div>
+      <div style="flex: 1"></div>
+      <div style="background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 5px; font-size: 0.9rem;">
+        High: <span id="highscore">0</span>
+      </div>
+    </header>
+
+    <div style="flex: 1; overflow-y: auto; padding: 10px 0;">
+      <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+        <div style="text-align: center;">
+          <div style="font-size: 0.9rem; color: var(--muted)">Level</div>
+          <div style="font-size: 1.5rem; font-weight: bold;" id="level">1</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.9rem; color: var(--muted)">Time</div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent)" id="timer">15</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 0.9rem; color: var(--muted)">Streak</div>
+          <div style="font-size: 1.5rem; font-weight: bold;" id="streak">0</div>
+        </div>
+      </div>
+
+      <div class="question" id="question">8 + 5 = ?</div>
+      
+      <div class="choices" id="choices">
+        <!-- Choices will be added by JavaScript -->
+      </div>
+
+      <div class="power-up-bar" id="powerUpBar">
+        <div class="power-up-slot" data-type="timeFreeze" title="Freeze timer">⏸️</div>
+        <div class="power-up-slot" data-type="doublePoints" title="Double points">⚡</div>
+        <div class="power-up-slot" data-type="extraLife" title="Extra life">❤️</div>
+        <div class="power-up-slot" data-type="skipQuestion" title="Skip question">⏭️</div>
+      </div>
+
+      <div class="big-score" id="score">0</div>
+      <div style="text-align: center; color: var(--muted); margin-bottom: 20px;">Royal Points</div>
+
+      <div class="footer-buttons">
+        <button class="btn" id="skip">Skip</button>
+        <button class="btn" id="hint">Hint</button>
+        <button class="btn" id="menuBtn">Menu</button>
+      </div>
+
+      <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <strong>Progress</strong>
+          <span id="needed">0/10</span>
+        </div>
+        <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden;">
+          <div id="progressBar" style="height: 100%; background: var(--accent); width: 0%; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px; text-align: center; color: var(--muted); font-size: 0.8rem;">
+        <div id="lives">❤️ ❤️ ❤️</div>
+        <div style="margin-top: 5px;">Tap numbers or press 1-4 to answer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Templates -->
+  <div id="modalOverlay" class="overlay">
+    <div class="modal" id="modalContent">
+      <!-- Content will be inserted here -->
+    </div>
+  </div>
+
+<script>
+// Game State with Achievements and Statistics
+const state = {
+  score: 0,
+  level: 1,
+  lives: 3,
+  streak: 0,
+  timeLeft: 15,
+  timer: null,
+  currentQuestion: null,
+  highscore: 0,
+  totalGames: 0,
+  achievements: {
+    firstGame: false,
+    score50: false,
+    score100: false,
+    streak5: false,
+    streak10: false,
+    level5: false,
+    level10: false,
+    perfectGame: false,
+    hardModeComplete: false,
+    expertModeComplete: false
+  },
+  stats: {
+    totalQuestions: 0,
+    correctAnswers: 0,
+    totalPlayTime: 0,
+    powerupsUsed: 0,
+    gamesPlayed: 0,
+    highestStreak: 0,
+    averageTime: 0
+  },
+  powerUps: {
+    timeFreeze: 1,
+    doublePoints: 1,
+    extraLife: 0,
+    skipQuestion: 1
+  },
+  isDoublePointsActive: false,
+  isTimeFrozen: false,
+  currentDifficulty: 'normal'
+};
+
+// DOM Elements
+const mainMenu = document.getElementById('mainMenu');
+const gameStage = document.getElementById('gameStage');
+const questionEl = document.getElementById('question');
+const choicesEl = document.getElementById('choices');
+const scoreEl = document.getElementById('score');
+const levelEl = document.getElementById('level');
+const timerEl = document.getElementById('timer');
+const streakEl = document.getElementById('streak');
+const livesEl = document.getElementById('lives');
+const progressEl = document.getElementById('progressBar');
+const neededEl = document.getElementById('needed');
+const highscoreEl = document.getElementById('highscore');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalContent = document.getElementById('modalContent');
+
+// Achievement Definitions
+const ACHIEVEMENTS = [
+  { id: 'firstGame', name: 'First Game', desc: 'Play your first game', icon: '🎮', unlocked: false },
+  { id: 'score50', name: 'Royal Beginner', desc: 'Score 50 points in one game', icon: '🥉', unlocked: false },
+  { id: 'score100', name: 'Math Noble', desc: 'Score 100 points in one game', icon: '🥈', unlocked: false },
+  { id: 'streak5', name: 'Hot Streak', desc: 'Get a 5-question streak', icon: '🔥', unlocked: false },
+  { id: 'streak10', name: 'Math Wizard', desc: 'Get a 10-question streak', icon: '🧙', unlocked: false },
+  { id: 'level5', name: 'Rising Star', desc: 'Reach level 5', icon: '⭐', unlocked: false },
+  { id: 'level10', name: 'Math Master', desc: 'Reach level 10', icon: '👑', unlocked: false },
+  { id: 'perfectGame', name: 'Perfectionist', desc: 'Complete a game without mistakes', icon: '💯', unlocked: false },
+  { id: 'hardModeComplete', name: 'Hardcore', desc: 'Complete a game on Hard difficulty', icon: '💪', unlocked: false },
+  { id: 'expertModeComplete', name: 'Math Genius', desc: 'Complete a game on Expert difficulty', icon: '🧠', unlocked: false }
+];
+
+// Utility Functions
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Helper function for notifications
+function showNotification(icon, message) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(90deg, rgba(139,92,246,0.15), rgba(232,194,74,0.1));
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 10px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    max-width: 300px;
+  `;
+  notification.innerHTML = `
+    <div style="font-size: 24px">${icon}</div>
+    <div style="font-size: 0.9rem">${message}</div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// Get difficulty settings
+function getDifficultySettings() {
+  const difficultySelect = document.getElementById('menuDifficultySelect');
+  const difficulty = difficultySelect.value;
+  state.currentDifficulty = difficulty;
+  
+  switch(difficulty) {
+    case 'easy':
+      return {
+        timer: 20,
+        lives: 4,
+        scoreMultiplier: 0.8,
+        hintPenalty: 1,
+        questionRange: 'simple'
+      };
+    case 'normal':
+      return {
+        timer: 15,
+        lives: 3,
+        scoreMultiplier: 1.0,
+        hintPenalty: 2,
+        questionRange: 'standard'
+      };
+    case 'hard':
+      return {
+        timer: 12,
+        lives: 3,
+        scoreMultiplier: 1.2,
+        hintPenalty: 3,
+        questionRange: 'advanced'
+      };
+    case 'expert':
+      return {
+        timer: 10,
+        lives: 2,
+        scoreMultiplier: 1.5,
+        hintPenalty: 4,
+        questionRange: 'expert'
+      };
+    case 'master':
+      return {
+        timer: 8,
+        lives: 1,
+        scoreMultiplier: 2.0,
+        hintPenalty: 5,
+        questionRange: 'master'
+      };
+    default:
+      return {
+        timer: 15,
+        lives: 3,
+        scoreMultiplier: 1.0,
+        hintPenalty: 2,
+        questionRange: 'standard'
+      };
+  }
+}
+
+// Power-up Functions
+function updatePowerUpDisplay() {
+  document.querySelectorAll('.power-up-slot').forEach(slot => {
+    const type = slot.dataset.type;
+    const count = state.powerUps[type] || 0;
+    slot.title = `${type.replace(/([A-Z])/g, ' $1').toLowerCase()} (${count} left)`;
+    
+    // Show count on the power-up
+    const countElement = slot.querySelector('.power-up-count') || document.createElement('div');
+    countElement.className = 'power-up-count';
+    countElement.style.cssText = `
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: var(--powerup);
+      color: white;
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    countElement.textContent = count;
+    
+    if (!slot.querySelector('.power-up-count')) {
+      slot.style.position = 'relative';
+      slot.appendChild(countElement);
+    }
+    
+    // Disable if no charges
+    slot.style.opacity = count > 0 ? '1' : '0.5';
+    slot.style.pointerEvents = count > 0 ? 'auto' : 'none';
+  });
+}
+
+function activateTimeFreeze() {
+  if (state.powerUps.timeFreeze > 0 && !state.isTimeFrozen) {
+    state.powerUps.timeFreeze--;
+    state.isTimeFrozen = true;
+    clearInterval(state.timer);
+    
+    // Visual feedback
+    timerEl.style.color = '#8b5cf6';
+    timerEl.style.animation = 'pulse 1s infinite';
+    
+    setTimeout(() => {
+      state.isTimeFrozen = false;
+      timerEl.style.color = '';
+      timerEl.style.animation = '';
+      startTimer();
+    }, 5000); // Freeze for 5 seconds
+    
+    updatePowerUpDisplay();
+    showNotification('⏸️ Time Frozen!', 'You have 5 seconds without timer pressure!');
+  }
+}
+
+function activateDoublePoints() {
+  if (state.powerUps.doublePoints > 0 && !state.isDoublePointsActive) {
+    state.powerUps.doublePoints--;
+    state.isDoublePointsActive = true;
+    
+    // Visual feedback
+    scoreEl.style.color = '#8b5cf6';
+    scoreEl.style.animation = 'pulse 1s infinite';
+    
+    setTimeout(() => {
+      state.isDoublePointsActive = false;
+      scoreEl.style.color = '';
+      scoreEl.style.animation = '';
+    }, 10000); // Active for 10 seconds
+    
+    updatePowerUpDisplay();
+    showNotification('⚡ Double Points Active!', 'Next correct answers give double points!');
+  }
+}
+
+function activateExtraLife() {
+  if (state.powerUps.extraLife > 0 && state.lives < 3) {
+    state.powerUps.extraLife--;
+    state.lives++;
+    updateUI();
+    updatePowerUpDisplay();
+    showNotification('❤️ Extra Life Gained!', 'You received an extra life!');
+  }
+}
+
+function activateSkipQuestion() {
+  if (state.powerUps.skipQuestion > 0) {
+    state.powerUps.skipQuestion--;
+    clearInterval(state.timer);
+    generateQuestion();
+    updatePowerUpDisplay();
+    showNotification('⏭️ Question Skipped!', 'Skipped to the next question!');
+  }
+}
+
+function addPowerUpCharges() {
+  // Add random power-up charges every few levels or based on score
+  const randomPowerUp = ['timeFreeze', 'doublePoints', 'extraLife', 'skipQuestion'][Math.floor(Math.random() * 4)];
+  state.powerUps[randomPowerUp] = (state.powerUps[randomPowerUp] || 0) + 1;
+  updatePowerUpDisplay();
+  showNotification('🎁 Power-up Found!', `You found a ${randomPowerUp.replace(/([A-Z])/g, ' $1').toLowerCase()} charge!`);
+}
+
+// Game Functions with Difficulty-based Question Generation
+function generateQuestion() {
+  // Get the selected game mode from the menu
+  const modeSelect = document.getElementById('menuModeSelect');
+  const selectedMode = modeSelect.value;
+  const difficulty = getDifficultySettings();
+  
+  let ops;
+  
+  // Determine which operations to use based on selected mode
+  switch(selectedMode) {
+    case 'addition':
+      ops = ['+'];
+      break;
+    case 'subtraction':
+      ops = ['-'];
+      break;
+    case 'multiplication':
+      ops = ['*'];
+      break;
+    case 'division':
+      ops = ['/'];
+      break;
+    case 'mixed':
+    default:
+      ops = ['+', '-', '*', '/'];
+  }
+  
+  const op = ops[randInt(0, ops.length - 1)];
+  let a, b, answer;
+  let maxRange, minRange;
+
+  // Adjust ranges based on difficulty and level
+  const levelFactor = Math.min(state.level / 10, 3); // Cap at 3x difficulty
+  const difficultyFactor = {
+    'easy': 0.5,
+    'normal': 1,
+    'hard': 1.5,
+    'expert': 2,
+    'master': 2.5
+  }[state.currentDifficulty] || 1;
+
+  const combinedFactor = levelFactor * difficultyFactor;
+
+  if (op === '+') {
+    // Addition gets progressively harder
+    minRange = Math.floor(10 + (10 * combinedFactor));
+    maxRange = Math.floor(50 + (50 * combinedFactor));
+    a = randInt(minRange, maxRange);
+    b = randInt(minRange, maxRange);
+    answer = a + b;
+  } else if (op === '-') {
+    // Subtraction gets progressively harder
+    minRange = Math.floor(20 + (20 * combinedFactor));
+    maxRange = Math.floor(60 + (60 * combinedFactor));
+    a = randInt(minRange, maxRange);
+    b = randInt(Math.floor(minRange * 0.5), a - Math.floor(5 * combinedFactor));
+    answer = a - b;
+  } else if (op === '*') {
+    // Multiplication gets progressively harder
+    minRange = Math.floor(2 + (2 * combinedFactor));
+    maxRange = Math.floor(12 + (8 * combinedFactor));
+    a = randInt(minRange, maxRange);
+    b = randInt(minRange, maxRange);
+    answer = a * b;
+  } else { // division
+    // Division gets progressively harder
+    if (state.currentDifficulty === 'easy') {
+      b = randInt(2, 5);
+      answer = randInt(2, 6);
+    } else if (state.currentDifficulty === 'normal') {
+      b = randInt(2, 8);
+      answer = randInt(2, 8);
+    } else if (state.currentDifficulty === 'hard') {
+      b = randInt(3, 10);
+      answer = randInt(3, 10);
+    } else if (state.currentDifficulty === 'expert') {
+      b = randInt(4, 15);
+      answer = randInt(4, 12);
+    } else { // master
+      b = randInt(5, 20);
+      answer = randInt(5, 15);
+    }
+    a = b * answer;
+    
+    // Ensure division problems make sense
+    if (state.currentDifficulty === 'expert' || state.currentDifficulty === 'master') {
+      // Add some trickier division with remainders disguised as integers
+      if (Math.random() < 0.3) {
+        const remainder = randInt(1, b - 1);
+        a = b * answer + remainder;
+      }
+    }
+  }
+
+  // Generate trickier wrong answers based on difficulty
+  const choices = new Set([answer]);
+  const wrongAnswerCount = 3;
+  
+  for (let i = 0; i < wrongAnswerCount; i++) {
+    let wrongAnswer;
+    let attempts = 0;
+    
+    do {
+      // Make wrong answers more deceptive on higher difficulties
+      if (state.currentDifficulty === 'easy') {
+        wrongAnswer = answer + randInt(-10, 10);
+      } else if (state.currentDifficulty === 'normal') {
+        wrongAnswer = answer + randInt(-(5 + Math.floor(state.level / 2)), 5 + Math.floor(state.level / 2));
+      } else if (state.currentDifficulty === 'hard') {
+        // Include answers that are off by common mistakes
+        if (op === '*') {
+          wrongAnswer = answer + randInt(-(answer * 0.2), answer * 0.2);
+        } else {
+          wrongAnswer = answer + randInt(-Math.floor(answer * 0.3), Math.floor(answer * 0.3));
+        }
+      } else if (state.currentDifficulty === 'expert') {
+        // Include answers from wrong operation
+        if (Math.random() < 0.3) {
+          if (op === '+') wrongAnswer = a - b;
+          else if (op === '-') wrongAnswer = a + b;
+          else if (op === '*') wrongAnswer = a + b;
+          else wrongAnswer = a * b;
+        } else {
+          wrongAnswer = answer + randInt(-Math.floor(answer * 0.2), Math.floor(answer * 0.2));
+        }
+      } else { // master
+        // Very deceptive answers
+        if (Math.random() < 0.5) {
+          // Common mistake patterns
+          if (op === '*') wrongAnswer = (a + 1) * (b - 1);
+          else if (op === '/') wrongAnswer = Math.floor(a / b) + randInt(-2, 2);
+          else if (op === '+') wrongAnswer = a - b;
+          else wrongAnswer = a + b;
+        } else {
+          wrongAnswer = answer + randInt(-Math.floor(answer * 0.15), Math.floor(answer * 0.15));
+        }
+      }
+      
+      // Ensure wrong answer is different from correct answer and other wrong answers
+      attempts++;
+      if (attempts > 50) {
+        wrongAnswer = answer + (i + 1) * 5; // Fallback
+        break;
+      }
+    } while (choices.has(wrongAnswer) || wrongAnswer === answer || wrongAnswer < 0);
+    
+    choices.add(wrongAnswer);
+  }
+
+  state.currentQuestion = {
+    question: `${a} ${op} ${b} = ?`,
+    answer: answer,
+    choices: shuffle(Array.from(choices)),
+    operation: op,
+    difficulty: state.currentDifficulty
+  };
+
+  displayQuestion();
+}
+
+function displayQuestion() {
+  const q = state.currentQuestion;
+  questionEl.textContent = q.question;
+  
+  // Reset any hint effects
+  choicesEl.innerHTML = '';
+  q.choices.forEach((choice, index) => {
+    const button = document.createElement('button');
+    button.className = 'choice';
+    button.innerHTML = `
+      <div style="font-size: 0.8rem; color: var(--muted)">${index + 1}</div>
+      <div>${choice}</div>
+    `;
+    button.addEventListener('click', () => checkAnswer(choice, button));
+    choicesEl.appendChild(button);
+  });
+
+  startTimer();
+}
+
+function startTimer() {
+  if (state.isTimeFrozen) return;
+  
+  const difficulty = getDifficultySettings();
+  clearInterval(state.timer);
+  state.timeLeft = difficulty.timer;
+  timerEl.textContent = state.timeLeft;
+  
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    timerEl.textContent = state.timeLeft;
+    
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      handleWrongAnswer();
+    }
+  }, 1000);
+}
+
+function checkAnswer(selected, button) {
+  clearInterval(state.timer);
+  
+  if (selected === state.currentQuestion.answer) {
+    handleCorrectAnswer(button);
+  } else {
+    handleWrongAnswer(button);
+  }
+}
+
+function handleCorrectAnswer(button) {
+  button.classList.add('correct');
+  
+  const difficulty = getDifficultySettings();
+  let basePoints = 10;
+  
+  // Adjust points based on difficulty
+  basePoints = Math.floor(basePoints * difficulty.scoreMultiplier);
+  
+  // Bonus for quick answers
+  const timeBonus = Math.max(1, Math.floor(state.timeLeft * 0.5));
+  basePoints += timeBonus;
+  
+  // Double points power-up
+  if (state.isDoublePointsActive) {
+    basePoints *= 2;
+  }
+  
+  // Streak bonus
+  const streakBonus = Math.min(state.streak * 2, 20); // Max 20 bonus
+  basePoints += streakBonus;
+  
+  state.score += basePoints;
+  state.streak++;
+  
+  // Update stats
+  state.stats.totalQuestions++;
+  state.stats.correctAnswers++;
+  
+  // Update highest streak
+  if (state.streak > state.stats.highestStreak) {
+    state.stats.highestStreak = state.streak;
+  }
+  
+  // Check streak achievements
+  checkAchievements();
+  
+  if (state.score > state.highscore) {
+    state.highscore = state.score;
+    highscoreEl.textContent = state.highscore;
+  }
+  
+  updateUI();
+  
+  // Occasionally add power-up charges (less frequent on easier difficulties)
+  const powerUpChance = {
+    'easy': 0.1,
+    'normal': 0.15,
+    'hard': 0.2,
+    'expert': 0.25,
+    'master': 0.3
+  }[state.currentDifficulty] || 0.15;
+  
+  if (Math.random() < powerUpChance) {
+    addPowerUpCharges();
+  }
+  
+  setTimeout(() => {
+    generateQuestion();
+  }, 1000);
+}
+
+function handleWrongAnswer(button) {
+  if (button) {
+    button.classList.add('wrong');
+  }
+  
+  state.lives--;
+  state.streak = 0;
+  
+  // Update stats
+  state.stats.totalQuestions++;
+  
+  updateUI();
+  
+  if (state.lives <= 0) {
+    gameOver();
+    return;
+  }
+  
+  setTimeout(() => {
+    generateQuestion();
+  }, 1000);
+}
+
+function updateUI() {
+  scoreEl.textContent = state.score;
+  levelEl.textContent = state.level;
+  streakEl.textContent = state.streak;
+  
+  // Update lives display
+  const difficulty = getDifficultySettings();
+  livesEl.innerHTML = '';
+  for (let i = 0; i < state.lives; i++) {
+    livesEl.innerHTML += '❤️ ';
+  }
+  
+  // Update progress
+  const progress = (state.score % 100) / 100 * 100;
+  progressEl.style.width = `${progress}%`;
+  neededEl.textContent = `${state.score % 100}/100`;
+  
+  // Check for level up
+  if (state.score >= state.level * 100) {
+    state.level++;
+    levelEl.textContent = state.level;
+    checkAchievements();
+    
+    // Show level up notification
+    if (state.level > 1) {
+      showNotification('🎉 Level Up!', `You reached level ${state.level}!`);
+    }
+  }
+}
+
+function checkAchievements() {
+  // First game achievement
+  if (state.stats.gamesPlayed > 0 && !state.achievements.firstGame) {
+    state.achievements.firstGame = true;
+    showAchievementUnlocked('First Game', '🎮');
+  }
+  
+  // Score achievements
+  if (state.score >= 50 && !state.achievements.score50) {
+    state.achievements.score50 = true;
+    showAchievementUnlocked('Royal Beginner', '🥉');
+  }
+  
+  if (state.score >= 100 && !state.achievements.score100) {
+    state.achievements.score100 = true;
+    showAchievementUnlocked('Math Noble', '🥈');
+  }
+  
+  // Streak achievements
+  if (state.streak >= 5 && !state.achievements.streak5) {
+    state.achievements.streak5 = true;
+    showAchievementUnlocked('Hot Streak', '🔥');
+  }
+  
+  if (state.streak >= 10 && !state.achievements.streak10) {
+    state.achievements.streak10 = true;
+    showAchievementUnlocked('Math Wizard', '🧙');
+  }
+  
+  // Level achievements
+  if (state.level >= 5 && !state.achievements.level5) {
+    state.achievements.level5 = true;
+    showAchievementUnlocked('Rising Star', '⭐');
+  }
+  
+  if (state.level >= 10 && !state.achievements.level10) {
+    state.achievements.level10 = true;
+    showAchievementUnlocked('Math Master', '👑');
+  }
+  
+  // Difficulty achievements (checked in gameOver)
+  
+  saveGame();
+}
+
+function showAchievementUnlocked(name, icon) {
+  // Create a simple notification
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, rgba(232,194,74,0.15), rgba(139,92,246,0.1));
+    border: 1px solid rgba(232,194,74,0.3);
+    border-radius: 10px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+  `;
+  notification.innerHTML = `
+    <div style="font-size: 24px">${icon}</div>
+    <div>
+      <div style="font-weight: 600">Achievement Unlocked!</div>
+      <div style="font-size: 0.9rem">${name}</div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+function gameOver() {
+  state.stats.gamesPlayed++;
+  state.totalGames++;
+  
+  // Check for perfect game achievement
+  if (state.lives === 3 && state.score > 0 && !state.achievements.perfectGame) {
+    state.achievements.perfectGame = true;
+    showAchievementUnlocked('Perfectionist', '💯');
+  }
+  
+  // Check difficulty achievements
+  if (state.currentDifficulty === 'hard' && !state.achievements.hardModeComplete) {
+    state.achievements.hardModeComplete = true;
+    showAchievementUnlocked('Hardcore', '💪');
+  }
+  
+  if (state.currentDifficulty === 'expert' && !state.achievements.expertModeComplete) {
+    state.achievements.expertModeComplete = true;
+    showAchievementUnlocked('Math Genius', '🧠');
+  }
+  
+  // Save game data
+  saveGame();
+  
+  alert(`Game Over! Your score: ${state.score}\nLevel reached: ${state.level}\nDifficulty: ${state.currentDifficulty.charAt(0).toUpperCase() + state.currentDifficulty.slice(1)}`);
+  
+  showMainMenu();
+}
+
+// Modal Functions
+function showModal(title, content) {
+  modalContent.innerHTML = `
+    <h3>${title}</h3>
+    <div>${content}</div>
+    <div style="margin-top: 20px; text-align: center;">
+      <button class="btn" id="closeModal" style="min-width: 100px;">Close</button>
+    </div>
+  `;
+  
+  modalOverlay.style.display = 'flex';
+  
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+}
+
+function closeModal() {
+  modalOverlay.style.display = 'none';
+}
+
+function showAchievementsModal() {
+  let content = '<div style="margin-top: 10px;">';
+  
+  ACHIEVEMENTS.forEach(ach => {
+    const unlocked = state.achievements[ach.id];
+    content += `
+      <div class="achievement-item">
+        <div class="achievement-icon">${ach.icon}</div>
+        <div class="achievement-info">
+          <div class="achievement-name">${ach.name}</div>
+          <div class="achievement-desc">${ach.desc}</div>
+        </div>
+        <div class="achievement-status">${unlocked ? '✅' : '🔒'}</div>
+      </div>
+    `;
+  });
+  
+  content += '</div>';
+  showModal('🏆 Achievements', content);
+}
+
+function showStatsModal() {
+  const accuracy = state.stats.totalQuestions > 0 
+    ? Math.round((state.stats.correctAnswers / state.stats.totalQuestions) * 100) 
+    : 0;
+  
+  const content = `
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-value">${state.stats.gamesPlayed}</div>
+        <div class="stat-label">Games Played</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.highscore}</div>
+        <div class="stat-label">High Score</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.stats.totalQuestions}</div>
+        <div class="stat-label">Questions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${accuracy}%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.stats.highestStreak}</div>
+        <div class="stat-label">Best Streak</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.stats.powerupsUsed}</div>
+        <div class="stat-label">Power-ups Used</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.currentDifficulty.charAt(0).toUpperCase() + state.currentDifficulty.slice(1)}</div>
+        <div class="stat-label">Current Difficulty</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">${state.level}</div>
+        <div class="stat-label">Highest Level</div>
+      </div>
+    </div>
+  `;
+  
+  showModal('📊 Game Statistics', content);
+}
+
+// Save/Load Functions
+function saveGame() {
+  const saveData = {
+    highscore: state.highscore,
+    totalGames: state.totalGames,
+    achievements: state.achievements,
+    stats: state.stats,
+    powerUps: state.powerUps
+  };
+  localStorage.setItem('kings_mathgo_save', JSON.stringify(saveData));
+}
+
+function loadGame() {
+  const saved = localStorage.getItem('kings_mathgo_save');
+  if (saved) {
+    const saveData = JSON.parse(saved);
+    state.highscore = saveData.highscore || 0;
+    state.totalGames = saveData.totalGames || 0;
+    state.achievements = saveData.achievements || state.achievements;
+    state.stats = saveData.stats || state.stats;
+    state.powerUps = saveData.powerUps || state.powerUps;
+    
+    // Update UI with loaded data
+    document.getElementById('menuHighscore').textContent = state.highscore;
+    document.getElementById('totalGames').textContent = state.totalGames;
+    highscoreEl.textContent = state.highscore;
+  }
+}
+
+// Menu Functions
+function showMainMenu() {
+  mainMenu.style.display = 'flex';
+  gameStage.style.display = 'none';
+  clearInterval(state.timer);
+  
+  // Load saved data
+  loadGame();
+}
+
+function startNewGame() {
+  // Reset game state (but keep achievements/stats)
+  state.score = 0;
+  state.level = 1;
+  state.streak = 0;
+  state.isDoublePointsActive = false;
+  state.isTimeFrozen = false;
+  
+  // Set lives based on difficulty
+  const difficulty = getDifficultySettings();
+  state.lives = difficulty.lives;
+  state.timeLeft = difficulty.timer;
+  
+  // Reset power-ups (give starting charges)
+  state.powerUps = {
+    timeFreeze: Math.max(1, Math.floor(2 - (difficulty.timer / 20))), // More on harder difficulties
+    doublePoints: 1,
+    extraLife: difficulty.lives < 3 ? 1 : 0, // Give extra life if starting with fewer lives
+    skipQuestion: 1
+  };
+  
+  mainMenu.style.display = 'none';
+  gameStage.style.display = 'flex';
+  
+  updateUI();
+  updatePowerUpDisplay();
+  generateQuestion();
+}
+
+// Event Listeners
+document.getElementById('startGame').addEventListener('click', startNewGame);
+document.getElementById('viewAchievements').addEventListener('click', showAchievementsModal);
+document.getElementById('viewStats').addEventListener('click', showStatsModal);
+document.getElementById('menuBtn').addEventListener('click', showMainMenu);
+
+// Fixed Hint Button
+document.getElementById('hint').addEventListener('click', () => {
+  const difficulty = getDifficultySettings();
+  
+  // Show one of the wrong answers as a hint (grey out two incorrect options)
+  const choices = choicesEl.querySelectorAll('.choice');
+  const correctAnswer = state.currentQuestion.answer;
+  let wrongChoicesShown = 0;
+  
+  // On harder difficulties, show fewer hints
+  let hintsToShow = 2;
+  if (state.currentDifficulty === 'expert') hintsToShow = 1;
+  if (state.currentDifficulty === 'master') hintsToShow = 0; // No hints on master!
+  
+  if (hintsToShow > 0) {
+    choices.forEach(choice => {
+      const choiceValue = parseInt(choice.querySelector('div:nth-child(2)').textContent);
+      if (choiceValue !== correctAnswer && wrongChoicesShown < hintsToShow) {
+        choice.style.opacity = '0.5';
+        choice.style.pointerEvents = 'none';
+        wrongChoicesShown++;
+      }
+    });
+  }
+  
+  // Add time penalty based on difficulty
+  state.timeLeft = Math.max(3, state.timeLeft - difficulty.hintPenalty);
+  timerEl.textContent = state.timeLeft;
+  
+  if (state.currentDifficulty === 'master') {
+    showNotification('⚠️ No Hints!', 'Master difficulty doesn\'t allow hints!');
+  }
+});
+
+// Fixed Skip Button
+document.getElementById('skip').addEventListener('click', () => {
+  // First check if player has skip power-up
+  if (state.powerUps.skipQuestion > 0) {
+    if (confirm('Use a skip question power-up instead of losing a life?')) {
+      activateSkipQuestion();
+      return;
+    }
+  }
+  
+  const difficulty = getDifficultySettings();
+  
+  // On master difficulty, can't skip at all
+  if (state.currentDifficulty === 'master') {
+    alert('Cannot skip questions on Master difficulty!');
+    return;
+  }
+  
+  // If no power-up or declined, use life system
+  if (state.lives > 1) {
+    state.lives--;
+    updateUI();
+    clearInterval(state.timer);
+    generateQuestion();
+    showNotification('⏭️ Skipped!', 'Used 1 life to skip question');
+  } else {
+    alert('Need at least 2 lives to skip!');
+  }
+});
+
+// Fixed Power-up Event Listeners
+document.querySelectorAll('.power-up-slot').forEach(slot => {
+  slot.addEventListener('click', () => {
+    const type = slot.dataset.type;
+    state.stats.powerupsUsed++;
+    
+    switch(type) {
+      case 'timeFreeze':
+        activateTimeFreeze();
+        break;
+      case 'doublePoints':
+        activateDoublePoints();
+        break;
+      case 'extraLife':
+        activateExtraLife();
+        break;
+      case 'skipQuestion':
+        activateSkipQuestion();
+        break;
+    }
+  });
+});
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (e.key >= '1' && e.key <= '4') {
+    const index = parseInt(e.key) - 1;
+    const buttons = choicesEl.querySelectorAll('.choice');
+    if (buttons[index]) {
+      buttons[index].click();
+    }
+  }
+});
+
+// Close modal when clicking outside
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) {
+    closeModal();
+  }
+});
+
+// Initialize
+showMainMenu();
+</script>
+</body>
+</html>
